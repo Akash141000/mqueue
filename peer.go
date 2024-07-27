@@ -1,9 +1,8 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/gorilla/websocket"
+	"golang.org/x/exp/slog"
 )
 
 type Peer interface {
@@ -21,21 +20,21 @@ func NewWSPeer(conn *websocket.Conn, server *Server) *WSPeer {
 		server: server,
 	}
 
-	go p.readLoop()
+	go p.readWrite()
 
 	return p
 }
 
-func (p *WSPeer) readLoop() {
+func (p *WSPeer) readWrite() {
 	var msg WSMessage
 	for {
 		if err := p.conn.ReadJSON(&msg); err != nil {
-			fmt.Println("ws peer read error", err)
-			continue
+			slog.Info("Peer", "ws peer read error", err)
+			break
 		}
 
 		if err := p.handleMessage(msg); err != nil {
-			fmt.Println("ws peer handle msg error", err)
+			slog.Info("Peer", "ws peer handle msg error", err)
 			continue
 		}
 
@@ -43,7 +42,7 @@ func (p *WSPeer) readLoop() {
 }
 
 func (p *WSPeer) handleMessage(msg WSMessage) (err error) {
-	fmt.Printf("handle message =>  %+v\n", msg)
+	slog.Info("Peer", "handle message", msg)
 	if msg.Action == "subscribe" {
 		p.server.AddPeerToTopics(p, msg.Topics...)
 	}

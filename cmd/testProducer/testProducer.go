@@ -6,17 +6,19 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+
+	"golang.org/x/exp/slog"
 )
 
 func main() {
 	url := "http://localhost:3000/publish"
-	topics := []string{"topic_1", "topic_2", "topic_3"}
+	topics := []string{"topic_1"}
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < len(topics); i++ {
 		topic := topics[rand.Intn(len(topics))]
 		payload := []byte(fmt.Sprintf("payload_%d", i))
 		resp, err := http.Post(url+"/"+topic, "application/octet-stream", bytes.NewReader(payload))
-		fmt.Println("resp", resp)
+		slog.Info("Producer", "resp", resp)
 		if err != nil {
 			log.Fatal(err)
 		}

@@ -2,8 +2,12 @@ package main
 
 import (
 	"fmt"
+	"io"
+	"log"
 	"net/http"
 	"strings"
+
+	"golang.org/x/exp/slog"
 )
 
 type Producer interface {
@@ -23,15 +27,11 @@ func NewHTTPProducer(listenAddr string, producerch chan Message) *HTTPProducer {
 }
 
 func (p *HTTPProducer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r.URL.Path)
+	slog.Info("Producer", "url", r.URL)
 	var (
 		path  = strings.Trim(r.URL.Path, "/")
 		parts = strings.Split(path, "/")
 	)
-
-	if r.Method == "GET" {
-		fmt.Println("GET")
-	}
 
 	if r.Method == "POST" {
 		if len(parts) != 2 {
@@ -39,16 +39,19 @@ func (p *HTTPProducer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		topic := parts[1]
-		fmt.Println("topic", topic)
+
+		payload, err := io.ReadAll(r.Body)
+		if err != nil {
+			log.Fatal("error reading payload", err)
+		}
+
 		p.producerch <- Message{
-			Data:  []byte("We don't know yet"),
-			Topic: parts[1],
+			Data:  []byte(payload),
+			Topic: topic,
 		}
 	}
-	fmt.Println("Parts", parts)
 }
 
 func (p *HTTPProducer) Start() error {
-	fmt.Println("HTTP transport started", "port", p.listenAddr)
 	return http.ListenAndServe(p.listenAddr, p)
 }

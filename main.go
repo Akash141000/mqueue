@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
+
+	"golang.org/x/exp/slog"
 )
 
 func StoreFunc() StoreProducerFunc {
@@ -10,7 +11,7 @@ func StoreFunc() StoreProducerFunc {
 }
 
 func main() {
-	fmt.Println("Starting mqueue")
+	slog.Info("Server", "Mqueue server starting...")
 	cfg := &Config{
 		HTTPListenAddr:    ":3000",
 		StoreProducerFunc: StoreFunc(),

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -28,10 +28,10 @@ func NewWSConsumer(listenAddr string, server *Server) *WSConsumer {
 func (ws *WSConsumer) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal("error upgrading the connection", err)
 	}
-	p := NewWSPeer(conn, ws.server)
-	ws.server.AddPeer(p)
+	NewWSPeer(conn, ws.server)
+	// ws.server.AddPeer(p)
 }
 
 type WSMessage struct {

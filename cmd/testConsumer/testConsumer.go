@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
+	"golang.org/x/exp/slog"
 )
 
 type WSMessage struct {
 	Action string   `json:"action"`
-	Topics []string `json:"topic"`
+	Topics []string `json:"topics"`
 }
 
 func main() {
@@ -20,18 +20,20 @@ func main() {
 
 	msg := WSMessage{
 		Action: "subscribe",
-		Topics: []string{"TestConsumer"},
+		Topics: []string{"topic_1"},
 	}
 
 	if err := conn.WriteJSON(msg); err != nil {
-		log.Fatal(err)
+		slog.Info("Consumer", "write error", err)
 	}
 
 	for {
-		msg := WSMessage{}
-		if err := conn.ReadJSON(msg); err != nil {
-			log.Fatal(err)
+		// var msg WSResponse
+		var msg []byte
+		_, msg, err := conn.ReadMessage()
+		if err != nil {
+			slog.Info("Consumer", "read error", err)
 		}
-		fmt.Println("msg", msg)
+		slog.Info("Consumer", "response", msg)
 	}
 }
