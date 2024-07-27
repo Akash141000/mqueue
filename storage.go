@@ -8,6 +8,7 @@ import (
 type Storer interface {
 	Push([]byte) (int, error)
 	Pull(int) ([]byte, error)
+	Len() int
 }
 
 type StoreProducerFunc func() Storer
@@ -40,4 +41,8 @@ func (s *MemoryStore) Pull(offset int) ([]byte, error) {
 		return nil, fmt.Errorf("offest (%d) too high", offset)
 	}
 	return s.data[offset], nil
+}
+
+func (s *MemoryStore) Len() int {
+	return len(s.data)
 }

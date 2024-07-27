@@ -102,16 +102,14 @@ func (s *Server) AddPeer(p Peer) {
 func (s *Server) AddPeerToTopics(p Peer, topics ...string) {
 	fmt.Println("adding peer to topics", topics)
 	for _, topic := range topics {
-
 		store := s.getStoreForTopic(topic)
 		size := store.Len()
-		// for i := 0; i < size; i++ {
-		// 	b, _ := store.Get(i)
-		// 	_,p := range s.peers {
-		// 		peer.Send(b)
-		// 	}
-		// }
-
+		for i := 0; i < size; i++ {
+			b, _ := store.Pull(i)
+			for p := range s.peers {
+				p.Send(b)
+			}
+		}
 	}
 	fmt.Println("adding peer to topics", topics, "peers", p)
 }

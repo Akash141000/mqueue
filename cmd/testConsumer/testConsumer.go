@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/gorilla/websocket"
@@ -31,5 +32,6 @@ func main() {
 		if err := conn.ReadJSON(msg); err != nil {
 			log.Fatal(err)
 		}
+		fmt.Println("msg", msg)
 	}
 }

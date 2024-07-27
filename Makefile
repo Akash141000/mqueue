@@ -9,6 +9,9 @@ build:
 run: build
 	./bin/mqueue
 
-test:
-	go run cmd/test/main.go
+testConsumer:
+	go run cmd/testConsumer/testConsumer.go
+
+testProducer:
+	go run cmd/testProducer/testProducer.go
 
